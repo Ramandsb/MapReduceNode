@@ -5,9 +5,9 @@ const route = express.Router()
 
 const controller = require('./user.controller')
 
-route.get('/',controller.getUsers)
-route.post('/',controller.postUsers)
-route.delete('/',controller.deleteUsers)
+route.get('/',controller.show)
+route.post('/',controller.create)
+route.delete('/:id',controller.destroy)
 
 
 module.exports= route

@@ -5,9 +5,7 @@ const bodyparser = require('body-parser')
 
 const route = express.Router();
 
-const transactions = require('./../api/transaction/')
-
-route.use('/transactions', transactions)
+route.use('/transactions', require('./../api/transaction/'))
 route.use('/users', require('./../api/user'))
 
 module.exports = route
