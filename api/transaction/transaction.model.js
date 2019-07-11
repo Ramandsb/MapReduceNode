@@ -11,7 +11,10 @@ const transactionSchema = new Schema({
     amount:Float,
     date:Date,
     reflected:String,
-    user_id:Int
+    user_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Users'
+    }
 })
 
 const transactionModel = mongoose.model('Transaction', transactionSchema)

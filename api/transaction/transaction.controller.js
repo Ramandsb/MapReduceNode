@@ -1,5 +1,6 @@
 'use strict'
 const Transaction = require('./transaction.model')
+const User = require('./../user/user.model')
 
 const calcUserHappiness = (TGR, TBR, TC) => {
     //handle divide by zero
@@ -50,13 +51,14 @@ exports.destroy = (req, res, next) => {
 }
 
 exports.transactionOne = (req, res, next) => {
-    return Transaction.aggregate([{ "$group": { _id: '$merchant', 'count': { '$sum': 1 } } }]).then(transaction => {
-        let result = {};
-        transaction.map(t => {
-            result[t._id] = t.count;
+    return Transaction.aggregate([{ "$group": { _id: '$merchant', 'count': { '$sum': 1 } } }])
+        .then(transaction => {
+            let result = {};
+            transaction.map(t => {
+                result[t._id] = t.count;
+            })
+            res.send(result)
         })
-        res.send(result)
-    })
         .catch(function (err) {
             res.status(500).send({ error: err })
         })
@@ -71,6 +73,10 @@ exports.transactionTwo = (req, res, next) => {
         $group: { _id: '$_id.user_id', reflection: { $push: { reflected: '$_id.reflected', count: "$count" } } }
     }])
         .then((transaction) => {
+            return User.populate(transaction, { path: '_id' })
+        })
+        .then((transaction) => {
+
 
             let result = []
 
@@ -89,10 +95,10 @@ exports.transactionTwo = (req, res, next) => {
                     }, 0);
 
                     let userHappinessResult = calcUserHappiness(totalGoodReflections, totalBADReflections, (totalGoodReflections + totalBADReflections))
-                    result.push({ [t._id]: userHappinessResult + '%' })
+                    result.push({ [t._id.name]: userHappinessResult })
                 })
             }
-            res.send(result);
+            res.send({ 'user_happiness': result });
         })
         .catch(err => {
             res.status(500).send({ error: err })
